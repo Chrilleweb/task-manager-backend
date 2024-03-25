@@ -6,7 +6,7 @@ const loginRegisterRoutes = require("./routes/loginRegister");
 const authRoutes = require("./routes/authRoutes");
 
 const app = express();
-const port = 3001;
+const port = process.env.PORT
 app.use(cors());
 
 const uri = process.env.MONGO_URL;
