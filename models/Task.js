@@ -25,7 +25,7 @@ const taskSchema = new mongoose.Schema({
     required: false,
   },
   subTasks: {
-    type: [subTaskSchema], // Use the subTaskSchema for the array of subtasks
+    type: [subTaskSchema],
     default: [],
   },
   userName: {

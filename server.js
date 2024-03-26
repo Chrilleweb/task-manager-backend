@@ -3,47 +3,54 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const loginRegisterRoutes = require("./routes/loginRegister");
-const authRoutes = require("./routes/authRoutes");
+const taskRoutes = require("./routes/taskRoutes");
 
 const app = express();
-const port = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8080;
 app.use(cors());
-
-const uri = process.env.MONGO_URL;
-const clientOptions = {
-  serverApi: { version: "1", strict: true, deprecationErrors: true },
-};
 
 // Use the body-parser middleware to parse JSON
 app.use(express.json());
 
 // Include the authentication routes
 app.use(loginRegisterRoutes);
-app.use("/auth", authRoutes);
+app.use("/auth", taskRoutes);
 
-// Define a route for the root URL
-app.get("/", () => {});
-
-async function run() {
+// MongoDB connection
+async function connectToMongoDB() {
   try {
-    // Create a Mongoose client with a MongoClientOptions object to set the Stable API version
+    const uri = process.env.MONGO_URL;
+    const clientOptions = {
+      serverApi: { version: "1", strict: true, deprecationErrors: true },
+    };
     await mongoose.connect(uri, clientOptions);
     await mongoose.connection.db.admin().command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!",
     );
-  } finally {
-    // Do not disconnect here if you want to maintain the connection
+    return true;
+  } catch (error) {
+    console.error("Error connecting to MongoDB:", error);
+    return false;
   }
 }
 
-// Your other routes and middleware setup code here
+// Start server
+async function startServer() {
+  try {
+    const connected = await connectToMongoDB();
+    if (!connected) {
+      throw new Error("Failed to connect to MongoDB. Server cannot start.");
+    }
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Error starting server:", error);
+  }
+}
 
-const server = app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
+// Call startServer to initiate server startup
+startServer();
 
-// Call the run function to establish the MongoDB connection
-run().catch(console.dir);
-
-module.exports = server; // for testing
+module.exports = app; // for testing
