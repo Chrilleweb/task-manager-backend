@@ -28,7 +28,7 @@ test("should register a new user", () => {
 test("should login a user", () => {
   request(server).post("/login")
     .send({
-      username: "testuser",
+      username: "Testuser",
       password: "testpassword",
     })
     .expect(200);

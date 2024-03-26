@@ -30,8 +30,10 @@ const login_post = async (req, res) => {
   try {
     const { username, password } = req.body;
 
+    const usernamelowerCase = username.toLowerCase();
+
     // Find the user by username
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ usernamelowerCase });
     if (!user) {
       return res.status(401).json({ message: "Invalid username or password" });
     }
